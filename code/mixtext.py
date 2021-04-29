@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from pytorch_transformers import *
 from transformers.modeling_bert import BertEmbeddings, BertPooler, BertLayer
-
+import geoopt
 
 class BertModel4Mix(BertPreTrainedModel):
     def __init__(self, config):
@@ -108,7 +108,7 @@ class BertEncoder4Mix(nn.Module):
         # Perform mix at till the mix_layer
         if mix_layer == -1:
             if hidden_states2 is not None:
-                hidden_states = l * hidden_states + (1-l)*hidden_states2
+                hidden_states = geoopt.PoincareBall.logmap0( geoopt.PoincareBall.mobius_add ( geoopt.PoincareBall.mobius_scalar_mul ( l , geoopt.PoincareBall.expmap0(hidden_states) ) , geoopt.PoincareBall.mobius_scalar_mul ( (1-l) , geoopt.PoincareBall.expmap0(hidden_states2) ) )    )
 
         for i, layer_module in enumerate(self.layer):
             if i <= mix_layer:
@@ -130,7 +130,7 @@ class BertEncoder4Mix(nn.Module):
 
             if i == mix_layer:
                 if hidden_states2 is not None:
-                    hidden_states = l * hidden_states + (1-l)*hidden_states2
+                    hidden_states = geoopt.PoincareBall.logmap0( geoopt.PoincareBall.mobius_add ( geoopt.PoincareBall.mobius_scalar_mul ( l , geoopt.PoincareBall.expmap0(hidden_states) ) , geoopt.PoincareBall.mobius_scalar_mul ( (1-l) , geoopt.PoincareBall.expmap0(hidden_states2) ) )    )
 
             if i > mix_layer:
                 if self.output_hidden_states:
